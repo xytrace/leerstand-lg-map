@@ -1,0 +1,7 @@
+{
+  "telegram_token": "YOURTELEGRAMBOT_TOKEN",
+  "supabase_url": "https://YOURPROJECTDOMAIN.supabase.co",
+  "supabase_key": "YOURSUPABASE_SERVICEROLE_KEY",
+  "supabase_bucket": "meldungen-bilder",
+  "supabase_table": "meldungen"
+}

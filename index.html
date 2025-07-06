@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>Leerstandsmeldungen Lüneburg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Font: Work Sans Black and Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter&family=Work+Sans:wght@900&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="webmap/assets/Leerstandsbot_Logo.svg">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Your custom stylesheet -->
+  <link rel="stylesheet" href="webmap/style.css" />
+</head>
+<body>
+
+  <!-- Header bar with logos and title -->
+  <div class="header">
+    <div class="logo-left">
+      <img src="webmap/assets/Leerstandsbot_Logo.svg" alt="Leerstandsbot Logo">
+    </div>
+    <h1>Leerstandsbot Karte</h1>
+    <div class="logo-right">
+      <img src="webmap/assets/KV_LG_Logo.svg" alt="KV Lüneburg Logo">
+    </div>
+  </div>
+
+  <!-- Map container -->
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Your map logic -->
+  <script src="webmap/script.js" type="module"></script>
+</body>
+</html>
