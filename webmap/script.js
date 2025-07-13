@@ -1,4 +1,4 @@
-const config = await (await fetch("config.json")).json();  // already fixed path
+const config = await (await fetch("config.json")).json();
 const SUPABASE_URL = config.supabase_url;
 const SUPABASE_API_KEY = config.supabase_key;
 const TABLE_NAME = config.supabase_table || "meldungen";
@@ -18,7 +18,11 @@ const redIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-let markers = [];
+// MarkerClusterGroup with maxClusterRadius of ~200 meters
+const markerClusterGroup = L.markerClusterGroup({
+  maxClusterRadius: 100  // pixels; roughly corresponds to ~200m at zoom level 13–15
+});
+map.addLayer(markerClusterGroup);
 
 async function fetchMeldungen() {
   const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?select=adresse,wohnungslage,dauer,bestaetigungen,image_url,lat,lon,created_at`;
@@ -30,9 +34,7 @@ async function fetchMeldungen() {
   });
   const data = await res.json();
 
-  // Remove previous markers
-  markers.forEach(m => map.removeLayer(m));
-  markers = [];
+  markerClusterGroup.clearLayers();
 
   data.forEach(item => {
     if (!item.lat || !item.lon) return;
@@ -44,13 +46,10 @@ async function fetchMeldungen() {
     if (item.created_at) html += `📅 Gemeldet am: ${new Date(item.created_at).toLocaleDateString()}<br>`;
     if (item.image_url) html += `<br><img src="${item.image_url}" width="200" style="margin-top:5px;">`;
 
-    const marker = L.marker([item.lat, item.lon], { icon: redIcon })
-      .bindPopup(html)
-      .addTo(map);
-
-    markers.push(marker);
+    const marker = L.marker([item.lat, item.lon], { icon: redIcon }).bindPopup(html);
+    markerClusterGroup.addLayer(marker);
   });
 }
 
 fetchMeldungen();
-setInterval(fetchMeldungen, 10000); // every 10 seconds
+setInterval(fetchMeldungen, 30000); // alle 30 Sekunden aktualisieren

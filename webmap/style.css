@@ -78,3 +78,14 @@ body {
   font-weight: 900;
   font-size: 15px;
 }
+
+.leaflet-popup-content-wrapper {
+  border: 2px solid #d70000;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+.leaflet-popup-tip {
+  background: #fff;
+  border-left: 2px solid #d70000;
+  border-bottom: 2px solid #d70000;
+}
