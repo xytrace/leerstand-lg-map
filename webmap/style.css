@@ -47,7 +47,7 @@ body {
   margin: 0;
   font-size: 1.8em;
   font-weight: 900;
-  color: red;
+  color: #ff0000;
   text-align: center;
   flex: 1;
 }
@@ -79,13 +79,22 @@ body {
   font-size: 15px;
 }
 
+/* Popup-Rahmen */
 .leaflet-popup-content-wrapper {
-  border: 2px solid #d70000;
+  border: 2px solid #ff0000;
   border-radius: 12px;
+  background: white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  margin-bottom: -1px; /* verhindert roten Übergang */
 }
+
+/* Spitze komplett weiß + kein sichtbarer Übergang */
 .leaflet-popup-tip {
-  background: #fff;
-  border-left: 2px solid #d70000;
-  border-bottom: 2px solid #d70000;
+  background: white !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 20px;
+  height: 20px;
+  margin-top: -1px;
+  transform: rotate(45deg);
 }
