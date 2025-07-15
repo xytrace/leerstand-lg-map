@@ -266,12 +266,12 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
 
 
 async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
+    chat_id = update.effective_chat.id
     meldungen = context.user_data.get("meldungen", [])
     index = context.user_data.get("meldung_index", 0)
 
     if not meldungen:
-        await query.edit_message_text("❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
+        await context.bot.send_message(chat_id=chat_id, text="❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
         return
 
     index = max(0, min(index, len(meldungen) - 1))
@@ -300,10 +300,20 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
         show = context.user_data.get("image_message_id")
         toggle_label = "❌ Bild ausblenden" if show else "📸 Bild ansehen"
         keyboard.append([InlineKeyboardButton(toggle_label, callback_data="toggle_image")])
-    
-    keyboard.append([InlineKeyboardButton("❌ Löschen", callback_data=f"delete_{m['id']}")])
 
+    keyboard.append([InlineKeyboardButton("❌ Löschen", callback_data=f"delete_{m['id']}")])
     keyboard.append([InlineKeyboardButton("🔙 Zurück zum Menü", callback_data="back_to_menu")])
     markup = InlineKeyboardMarkup(keyboard)
 
-    await query.edit_message_text(caption, reply_markup=markup)
+    # Delete previous message (if needed)
+    old_message_id = context.user_data.get("meldung_message_id")
+    if old_message_id:
+        try:
+            await context.bot.delete_message(chat_id=chat_id, message_id=old_message_id)
+        except:
+            pass  # message might already be gone
+
+    # Send new message from the bot
+    sent = await context.bot.send_message(chat_id=chat_id, text=caption, reply_markup=markup)
+    context.user_data["meldung_message_id"] = sent.message_id
+
