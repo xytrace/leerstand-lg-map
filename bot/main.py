@@ -32,10 +32,8 @@ app.add_handler(CommandHandler("meldungen", handle_all_meldungen))
 app.add_handler(CommandHandler("loesche", handle_delete))
 app.add_handler(CommandHandler("bestaetige", handle_confirm))
 
-# Pattern-based CallbackQueryHandlers to avoid conflicts
-app.add_handler(CallbackQueryHandler(handle_buttons, pattern="^menu_"))  
-app.add_handler(CallbackQueryHandler(handle_button_callback))            
-
+app.add_handler(CallbackQueryHandler(handle_buttons))
+app.add_handler(CallbackQueryHandler(handle_button_callback))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
