@@ -5,7 +5,7 @@ import telegram
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from bot.db.supabase_client import get_or_create_user, add_points, save_meldung, get_user_meldungen, supabase
+from bot.db.supabase_client import get_or_create_user, add_points, save_meldung, get_user_meldungen, supabase, delete_meldung
 from bot.util.helpers import build_main_menu, build_back_menu
 from bot.util.geocode import geocode_address
 
@@ -44,7 +44,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         context.user_data["coords"] = (lat, lon)
-        await loading_msg.edit_text(f"✅ Adresse existiert: {text}")
+        await loading_msg.edit_text(f"✅ Adresse bestätigt: {text}")
 
         keyboard = [
             [InlineKeyboardButton("EG", callback_data="wl_eg"), InlineKeyboardButton("OG", callback_data="wl_og")],
@@ -63,7 +63,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             context.user_data["meldung_step"] = "foto"
         else:
-            await update.message.reply_text("❌ Bitte gib eine gültige Zahl für das Stockwerk an (z.B. 3 für 3. OG):")
+            await update.message.reply_text("❌ Bitte gib eine gÄultige Zahl für das Stockwerk an (z.B. 3 für 3. OG):")
             return
 
     elif step == "wohnungslage_sonstige":
@@ -234,7 +234,7 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
     elif data.startswith("wl_"):
         val = data[3:]
         if val == "og":
-            await query.edit_message_text("🌀 Welches Stockwerk?")
+            await query.edit_message_text("🌀 Welches Stockwerk? (z.B. 3 für 3. OG)")
             context.user_data["meldung_step"] = "wohnungslage_og"
         elif val == "sonstige":
             await query.edit_message_text("Bitte beschreibe die Lage der Wohnung.")
