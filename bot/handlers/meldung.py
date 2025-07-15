@@ -36,14 +36,16 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if step == "adresse":
         context.user_data["adresse"] = text
-        await update.message.reply_text("📍 Adresse wird überprüft … ⏳")
+        loading_msg = await update.message.reply_text("📍 Adresse wird überprüft … ⏳")
 
         lat, lon = await geocode_address(text)
         if lat is None or lon is None:
-            await update.message.reply_text("❌ Adresse nicht gefunden. Bitte erneut eingeben:")
+            await loading_msg.edit_text("❌ Adresse nicht gefunden. Bitte erneut eingeben:")
             return
 
         context.user_data["coords"] = (lat, lon)
+        await loading_msg.edit_text(f"✅ Adresse existiert: {text}")
+
         keyboard = [
             [InlineKeyboardButton("EG", callback_data="wl_eg"), InlineKeyboardButton("OG", callback_data="wl_og")],
             [InlineKeyboardButton("Vorderhaus", callback_data="wl_vh"), InlineKeyboardButton("Hinterhaus", callback_data="wl_hh")],
