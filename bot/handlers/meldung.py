@@ -63,7 +63,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             context.user_data["meldung_step"] = "foto"
         else:
-            await update.message.reply_text("❌ Bitte gib eine gÄultige Zahl für das Stockwerk an (z.B. 3 für 3. OG):")
+            await update.message.reply_text("❌ Bitte gib eine gültige Zahl für das Stockwerk an (z.B. 3 für 3. OG):")
             return
 
     elif step == "wohnungslage_sonstige":
@@ -221,10 +221,24 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
 
     elif data == "confirm_delete":
         mid = context.user_data.pop("pending_delete", None)
-        if mid is not None and delete_meldung(mid):
-            await query.edit_message_text("✅ Meldung gelöscht.", reply_markup=build_main_menu())
+        if mid is not None and await asyncio.to_thread(delete_meldung, mid):
+            meldungen = context.user_data.get("meldungen", [])
+            index = context.user_data.get("meldung_index", 0)
+
+            # Remove the deleted one
+            meldungen = [m for m in meldungen if m["id"] != mid]
+            context.user_data["meldungen"] = meldungen
+
+            if not meldungen:
+                await query.edit_message_text("✅ Meldung gelöscht. Du hast keine weiteren Meldungen.", reply_markup=build_main_menu())
+            else:
+                # Adjust index if needed
+                if index >= len(meldungen):
+                    context.user_data["meldung_index"] = max(0, len(meldungen) - 1)
+                await show_meldung(update, context)
         else:
             await query.edit_message_text("❌ Fehler beim Löschen oder keine Meldung ausgewählt.", reply_markup=build_main_menu())
+
 
     elif data == "back_to_menu":
         from bot.start import handle_start
@@ -287,7 +301,7 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
         toggle_label = "❌ Bild ausblenden" if show else "📸 Bild ansehen"
         keyboard.append([InlineKeyboardButton(toggle_label, callback_data="toggle_image")])
     
-    keyboard.append([InlineKeyboardButton("🗑️ Löschen", callback_data=f"delete_{m['id']}")])
+    keyboard.append([InlineKeyboardButton("❌ Löschen", callback_data=f"delete_{m['id']}")])
 
     keyboard.append([InlineKeyboardButton("🔙 Zurück zum Menü", callback_data="back_to_menu")])
     markup = InlineKeyboardMarkup(keyboard)
