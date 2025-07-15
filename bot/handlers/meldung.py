@@ -2,6 +2,7 @@ import os
 import uuid
 import re
 import telegram
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
@@ -276,13 +277,13 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
     elif data == "noop":
         pass
 
-
 async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
     meldungen = context.user_data.get("meldungen", [])
     index = context.user_data.get("meldung_index", 0)
 
     if not meldungen:
-        await update.callback_query.edit_message_text("❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
+        await context.bot.send_message(chat_id=chat_id, text="❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
         return
 
     index = max(0, min(index, len(meldungen) - 1))
@@ -308,19 +309,21 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard.append(nav_buttons)
 
     if m.get("image_url"):
-        show = context.user_data.get("image_message_id")
-        toggle_label = "❌ Bild ausblenden" if show else "📸 Bild ansehen"
+        toggle_label = "📸 Bild ansehen"
         keyboard.append([InlineKeyboardButton(toggle_label, callback_data="toggle_image")])
 
     keyboard.append([InlineKeyboardButton("❌ Löschen", callback_data=f"delete_{m['id']}")])
     keyboard.append([InlineKeyboardButton("🔙 Zurück zum Menü", callback_data="back_to_menu")])
     markup = InlineKeyboardMarkup(keyboard)
 
-    # 🪄 Try smooth in-place update first
-    try:
-        await update.callback_query.edit_message_text(text=caption, reply_markup=markup)
-    except Exception:
-        # Fallback to sending a new message if message can't be edited (e.g., was deleted)
-        chat_id = update.effective_chat.id
-        sent = await context.bot.send_message(chat_id=chat_id, text=caption, reply_markup=markup)
-        context.user_data["meldung_message_id"] = sent.message_id
+    # ✨ Delete previous message to trigger vanish animation
+    old_msg_id = context.user_data.get("meldung_message_id")
+    if old_msg_id:
+        try:
+            await context.bot.delete_message(chat_id=chat_id, message_id=old_msg_id)
+            await asyncio.sleep(0.25)  # short pause for vanish effect
+        except:
+            pass
+
+    sent = await context.bot.send_message(chat_id=chat_id, text=caption, reply_markup=markup)
+    context.user_data["meldung_message_id"] = sent.message_id
