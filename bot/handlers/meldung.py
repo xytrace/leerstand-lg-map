@@ -278,12 +278,11 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
 
 
 async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
     meldungen = context.user_data.get("meldungen", [])
     index = context.user_data.get("meldung_index", 0)
 
     if not meldungen:
-        await context.bot.send_message(chat_id=chat_id, text="❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
+        await update.callback_query.edit_message_text("❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
         return
 
     index = max(0, min(index, len(meldungen) - 1))
@@ -317,15 +316,11 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard.append([InlineKeyboardButton("🔙 Zurück zum Menü", callback_data="back_to_menu")])
     markup = InlineKeyboardMarkup(keyboard)
 
-    # Delete previous message (if needed)
-    old_message_id = context.user_data.get("meldung_message_id")
-    if old_message_id:
-        try:
-            await context.bot.delete_message(chat_id=chat_id, message_id=old_message_id)
-        except:
-            pass  # message might already be gone
-
-    # Send new message from the bot
-    sent = await context.bot.send_message(chat_id=chat_id, text=caption, reply_markup=markup)
-    context.user_data["meldung_message_id"] = sent.message_id
-
+    # 🪄 Try smooth in-place update first
+    try:
+        await update.callback_query.edit_message_text(text=caption, reply_markup=markup)
+    except Exception:
+        # Fallback to sending a new message if message can't be edited (e.g., was deleted)
+        chat_id = update.effective_chat.id
+        sent = await context.bot.send_message(chat_id=chat_id, text=caption, reply_markup=markup)
+        context.user_data["meldung_message_id"] = sent.message_id
