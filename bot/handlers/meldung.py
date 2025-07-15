@@ -278,14 +278,15 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
         pass
 
 async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
     meldungen = context.user_data.get("meldungen", [])
     index = context.user_data.get("meldung_index", 0)
 
     if not meldungen:
-        await update.callback_query.edit_message_text("❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
+        await query.edit_message_text("❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
         return
 
-
+    # Keep index in bounds
     index = max(0, min(index, len(meldungen) - 1))
     context.user_data["meldung_index"] = index
     m = meldungen[index]
@@ -299,22 +300,21 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"✅ Bestätigt: {m['bestaetigungen']}x"
     )
 
+    # Navigation + actions
     keyboard = []
-    nav_buttons = []
     if index > 0:
-        nav_buttons.append(InlineKeyboardButton("⬅️ Zurück", callback_data="prev_meldung"))
+        keyboard.append([InlineKeyboardButton("⬅️ Zurück", callback_data="prev_meldung")])
     if index < total - 1:
-        nav_buttons.append(InlineKeyboardButton("Weiter ➡️", callback_data="next_meldung"))
-    if nav_buttons:
-        keyboard.append(nav_buttons)
+        keyboard.append([InlineKeyboardButton("Weiter ➡️", callback_data="next_meldung")])
 
     if m.get("image_url"):
-        toggle_label = "📸 Bild ansehen"
+        toggle_label = "❌ Bild ausblenden" if context.user_data.get("image_message_id") else "📸 Bild ansehen"
         keyboard.append([InlineKeyboardButton(toggle_label, callback_data="toggle_image")])
 
     keyboard.append([InlineKeyboardButton("❌ Löschen", callback_data=f"delete_{m['id']}")])
     keyboard.append([InlineKeyboardButton("🔙 Zurück zum Menü", callback_data="back_to_menu")])
+
     markup = InlineKeyboardMarkup(keyboard)
 
-    # ✨ Delete previous message to trigger vanish animation
-    await update.callback_query.edit_message_text(text=caption, reply_markup=markup)
+    # ✨ Trigger vanish by editing same message
+    await query.edit_message_text(text=caption, reply_markup=markup)
