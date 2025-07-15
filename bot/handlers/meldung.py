@@ -53,16 +53,16 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["meldung_step"] = "wohnungslage"
 
     elif step == "wohnungslage_og":
-            if re.match(r"^\d+$", text.strip()):
-                context.user_data["wohnungslage"] = f"{text.strip()}. OG"
-            else:
-                await update.message.reply_text("❌ Bitte gib eine gültige Zahl für das Stockwerk an (z. B. 3 für 3. OG):")
-                return
-        await update.message.reply_text(
-            "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Überspringen", callback_data="skip_photo")]])
-        )
-        context.user_data["meldung_step"] = "foto"
+        if re.match(r"^\d+$", text.strip()):
+            context.user_data["wohnungslage"] = f"{text.strip()}. OG"
+            await update.message.reply_text(
+                "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Überspringen", callback_data="skip_photo")]])
+            )
+            context.user_data["meldung_step"] = "foto"
+        else:
+            await update.message.reply_text("❌ Bitte gib eine gültige Zahl für das Stockwerk an (z.B. 3 für 3. OG):")
+            return
 
     elif step == "wohnungslage_sonstige":
         context.user_data["wohnungslage"] = text
@@ -71,6 +71,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Überspringen", callback_data="skip_photo")]])
         )
         context.user_data["meldung_step"] = "foto"
+
 
     elif step == "dauer":
         dauer = text
