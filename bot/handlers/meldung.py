@@ -143,8 +143,13 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
         from bot.db.supabase_client import top_five
         ranking = top_five()
         if not ranking:
-            await query.edit_message_text("🏆 *Bestenliste*\n\nNoch keine Punkte vergeben.", parse_mode="Markdown")
+            await query.edit_message_text(
+                "🏆 *Bestenliste*\n\nNoch keine Punkte vergeben.",
+                parse_mode="Markdown",
+                reply_markup=build_back_menu()
+            )
             return
+
 
         medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
         lines = [
