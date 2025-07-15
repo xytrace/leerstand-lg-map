@@ -211,13 +211,25 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
     elif data.startswith("delete_"):
         mid = int(data.split("_")[1])
         context.user_data["pending_delete"] = mid
-        await query.edit_message_text(
-            f"⚠️ Möchtest du Meldung #{mid} wirklich löschen?",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("✅ Ja", callback_data="confirm_delete")],
-                [InlineKeyboardButton("❌ Nein", callback_data="back_to_menu")]
-            ])
+
+        # Delete previous message (if exists)
+        old_msg_id = context.user_data.pop("meldung_message_id", None)
+        if old_msg_id:
+            try:
+                await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=old_msg_id)
+            except:
+                pass
+
+        confirm_markup = InlineKeyboardMarkup([
+            [InlineKeyboardButton("✅ Ja", callback_data="confirm_delete")],
+            [InlineKeyboardButton("❌ Nein", callback_data="back_to_menu")]
+        ])
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"⚠️ Möchtest du Meldung #{mid} wirklich löschen?",
+            reply_markup=confirm_markup
         )
+
 
     elif data == "confirm_delete":
         mid = context.user_data.pop("pending_delete", None)

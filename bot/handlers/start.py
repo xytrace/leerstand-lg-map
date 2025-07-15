@@ -1,14 +1,15 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-
 from bot.db.supabase_client import get_or_create_user
+
 
 def build_main_menu():
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🏠 Neue Meldung", callback_data='neue_meldung')],
-        [InlineKeyboardButton("🏆 Bestenliste", callback_data='bestenliste')],
-        [InlineKeyboardButton("📋 Meine Meldungen", callback_data='meine_meldungen')]
+        [InlineKeyboardButton("🏠 Neue Meldung", callback_data='menu_neue_meldung')],
+        [InlineKeyboardButton("🏆 Bestenliste", callback_data='menu_bestenliste')],
+        [InlineKeyboardButton("📋 Meine Meldungen", callback_data='menu_meine_meldungen')]
     ])
+
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tg_user = update.effective_user
@@ -19,15 +20,14 @@ async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = f"{welcome}\n\n🏠 *Leerstand-Melde-Bot*\n\nWähle eine Option:"
     markup = build_main_menu()
 
-    # CASE 1: called via /start
     if update.message:
         await update.message.reply_text(text, reply_markup=markup, parse_mode='Markdown')
-    # CASE 2: called via callback button
     elif update.callback_query:
         try:
             await update.callback_query.edit_message_text(text, reply_markup=markup, parse_mode='Markdown')
         except Exception:
             await update.callback_query.message.reply_text(text, reply_markup=markup, parse_mode='Markdown')
+
 
 async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -40,7 +40,8 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data.clear()
     elif data == 'noop':
         pass
-    else:
-        context.user_data['callback_data'] = data
+    elif data.startswith("menu_"):
+        # Route to meldung handler logic
+        context.user_data['callback_data'] = data.replace("menu_", "")
         from . import meldung
         await meldung.handle_button_callback(update, context)
