@@ -35,15 +35,36 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     step = context.user_data.get("meldung_step")
 
     if step == "adresse":
-        error = validate_address(text)
-        if error:
-            await update.message.reply_text(f"❌ {error}\nBitte nochmals eingeben:")
-            return
         context.user_data["adresse"] = text
-        await update.message.reply_text("🏠 Wie ist die Wohnungslage? (z.B. 3. OG, Hinterhaus, etc.)")
+        await update.message.reply_text("📍 Adresse wird überprüft … ⏳")
+
+        lat, lon = await geocode_address(text)
+        if lat is None or lon is None:
+            await update.message.reply_text("❌ Adresse nicht gefunden. Bitte erneut eingeben:")
+            return
+
+        context.user_data["coords"] = (lat, lon)
+        keyboard = [
+            [InlineKeyboardButton("EG", callback_data="wl_eg"), InlineKeyboardButton("OG", callback_data="wl_og")],
+            [InlineKeyboardButton("Vorderhaus", callback_data="wl_vh"), InlineKeyboardButton("Hinterhaus", callback_data="wl_hh")],
+            [InlineKeyboardButton("Sonstige", callback_data="wl_sonstige")]
+        ]
+        await update.message.reply_text("🏠 Wo befindet sich die Wohnung?", reply_markup=InlineKeyboardMarkup(keyboard))
         context.user_data["meldung_step"] = "wohnungslage"
 
-    elif step == "wohnungslage":
+    elif step == "wohnungslage_og":
+            if re.match(r"^\d+$", text.strip()):
+                context.user_data["wohnungslage"] = f"{text.strip()}. OG"
+            else:
+                await update.message.reply_text("❌ Bitte gib eine gültige Zahl für das Stockwerk an (z. B. 3 für 3. OG):")
+                return
+        await update.message.reply_text(
+            "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Überspringen", callback_data="skip_photo")]])
+        )
+        context.user_data["meldung_step"] = "foto"
+
+    elif step == "wohnungslage_sonstige":
         context.user_data["wohnungslage"] = text
         await update.message.reply_text(
             "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
@@ -51,19 +72,12 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         context.user_data["meldung_step"] = "foto"
 
-    elif step == "foto":
-        await update.message.reply_text("Bitte schicke ein Foto oder tippe auf 'Überspringen'.")
-
     elif step == "dauer":
         dauer = text
         adresse = context.user_data.get("adresse")
         wohnungslage = context.user_data.get("wohnungslage")
         img_path = context.user_data.get("img_path")
-
-        lat, lon = await geocode_address(adresse)
-        if lat is None or lon is None:
-            await update.message.reply_text("❌ Adresse konnte nicht geokodiert werden.")
-            return
+        lat, lon = context.user_data.get("coords", (None, None))
 
         status = await save_meldung(
             user_id=user_id,
@@ -80,18 +94,16 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await add_points(telegram_id, 5)
             msg = (
-                f"✅ *Meldung gespeichert!*\n\n📍 *Adresse:* {adresse}\n🏠 *Lage:* {wohnungslage}\n⏰ *Dauer:* {dauer}\n\nDanke! (+5 Punkte)"
+                f"✅ *Meldung gespeichert!*\n\n📍 *Adresse:* {adresse}\n"
+                f"🏠 *Lage:* {wohnungslage}\n⏰ *Dauer:* {dauer}\n\nDanke! (+5 Punkte)"
             )
 
-        await update.message.reply_text(
-            msg,
-            parse_mode="Markdown",
-            reply_markup=build_main_menu()
-        )
+        await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=build_main_menu())
         context.user_data.clear()
 
     else:
         await update.message.reply_text("Bitte benutze die Buttons im Menü:", reply_markup=build_main_menu())
+
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -188,10 +200,44 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
         context.user_data["meldung_step"] = "dauer"
         await query.edit_message_text("⏰ Wie lange steht die Wohnung schon leer?")
 
+    elif data.startswith("delete_"):
+        mid = int(data.split("_")[1])
+        context.user_data["pending_delete"] = mid
+        await query.edit_message_text(
+            f"⚠️ Möchtest du Meldung #{mid} wirklich löschen?",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("✅ Ja", callback_data="confirm_delete")],
+                [InlineKeyboardButton("❌ Nein", callback_data="back_to_menu")]
+            ])
+        )
+
+    elif data == "confirm_delete":
+        mid = context.user_data.pop("pending_delete", None)
+        if mid is not None and delete_meldung(mid):
+            await query.edit_message_text("✅ Meldung gelöscht.", reply_markup=build_main_menu())
+        else:
+            await query.edit_message_text("❌ Fehler beim Löschen oder keine Meldung ausgewählt.", reply_markup=build_main_menu())
+
     elif data == "back_to_menu":
         from bot.start import handle_start
         await handle_start(update, context)
         context.user_data.clear()
+
+    elif data.startswith("wl_"):
+        val = data[3:]
+        if val == "og":
+            await query.edit_message_text("🌀 Welches Stockwerk?")
+            context.user_data["meldung_step"] = "wohnungslage_og"
+        elif val == "sonstige":
+            await query.edit_message_text("Bitte beschreibe die Lage der Wohnung.")
+            context.user_data["meldung_step"] = "wohnungslage_sonstige"
+        else:
+            context.user_data["wohnungslage"] = val.upper() if val in ("eg", "og") else val.capitalize()
+            await query.edit_message_text(
+                "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Überspringen", callback_data="skip_photo")]])
+            )
+            context.user_data["meldung_step"] = "foto"
 
     elif data == "noop":
         pass
@@ -232,6 +278,8 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
         show = context.user_data.get("image_message_id")
         toggle_label = "❌ Bild ausblenden" if show else "📸 Bild ansehen"
         keyboard.append([InlineKeyboardButton(toggle_label, callback_data="toggle_image")])
+    
+    keyboard.append([InlineKeyboardButton("🗑️ Löschen", callback_data=f"delete_{m['id']}")])
 
     keyboard.append([InlineKeyboardButton("🔙 Zurück zum Menü", callback_data="back_to_menu")])
     markup = InlineKeyboardMarkup(keyboard)
