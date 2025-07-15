@@ -278,13 +278,13 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
         pass
 
 async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
     meldungen = context.user_data.get("meldungen", [])
     index = context.user_data.get("meldung_index", 0)
 
     if not meldungen:
-        await context.bot.send_message(chat_id=chat_id, text="❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
+        await update.callback_query.edit_message_text("❌ Keine Meldungen gefunden.", reply_markup=build_back_menu())
         return
+
 
     index = max(0, min(index, len(meldungen) - 1))
     context.user_data["meldung_index"] = index
@@ -317,13 +317,4 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
     markup = InlineKeyboardMarkup(keyboard)
 
     # ✨ Delete previous message to trigger vanish animation
-    old_msg_id = context.user_data.get("meldung_message_id")
-    if old_msg_id:
-        try:
-            await context.bot.delete_message(chat_id=chat_id, message_id=old_msg_id)
-            await asyncio.sleep(0.25)  # short pause for vanish effect
-        except:
-            pass
-
-    sent = await context.bot.send_message(chat_id=chat_id, text=caption, reply_markup=markup)
-    context.user_data["meldung_message_id"] = sent.message_id
+    await update.callback_query.edit_message_text(text=caption, reply_markup=markup)
