@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-from bot.db.supabase_client import top_five, get_user_meldungen, confirm_meldung, admin_delete_meldung
+from bot.db.supabase_client import top_five, get_user_meldungen, confirm_meldung, delete_meldung
 from bot.util.helpers import build_main_menu
 
 ADMIN_USERNAMES = {"ohne_u", "vicquick"}  # Adjust as needed
@@ -78,7 +78,7 @@ async def handle_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Ungültige ID")
         return
 
-    success = admin_delete_meldung(mid)
+    success = delete_meldung(mid)
     if not success:
         await update.message.reply_text("❌ Meldung nicht gefunden.")
     else:
