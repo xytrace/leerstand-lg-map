@@ -335,7 +335,7 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
         toggle_label = "❌ Bild ausblenden" if context.user_data.get("image_message_id") else "📸 Bild ansehen"
         keyboard.append([InlineKeyboardButton(toggle_label, callback_data="toggle_image")])
 
-    keyboard.append([InlineKeyboardButton("🗑️ Löschen", callback_data=f"delete_{m['id']}")])
+    keyboard.append([InlineKeyboardButton("❌ Löschen", callback_data=f"delete_{m['id']}")])
     keyboard.append([InlineKeyboardButton("🔙 Zurück zum Menü", callback_data="back_to_menu")])
 
     markup = InlineKeyboardMarkup(keyboard)
