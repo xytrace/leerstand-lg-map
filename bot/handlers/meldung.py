@@ -6,7 +6,7 @@ import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from bot.db.supabase_client import get_or_create_user, add_points, save_meldung, get_user_meldungen, supabase, delete_meldung
+from bot.db.supabase_client import get_or_create_user, add_points, save_meldung, get_user_meldungen, supabase, delete_user_meldung
 from bot.util.helpers import build_main_menu, build_back_menu
 from bot.util.geocode import geocode_address
 
@@ -96,7 +96,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if status == "confirmed":
             msg = "✅ *Bestätigung gespeichert!*\n\nDieser Leerstand war bereits bekannt, danke für die Bestätigung! (+2 Punkte)"
         else:
-            await add_points(telegram_id, 5)
             msg = (
                 f"✅ *Meldung gespeichert!*\n\n📍 *Adresse:* {adresse}\n"
                 f"🏠 *Lage:* {wohnungslage}\n⏰ *Dauer:* {dauer}\n\nDanke! (+5 Punkte)"
@@ -213,48 +212,74 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
         mid = int(data.split("_")[1])
         context.user_data["pending_delete"] = mid
 
-        # Delete previous message (if exists)
-        old_msg_id = context.user_data.pop("meldung_message_id", None)
-        if old_msg_id:
+        # Clean up any existing image message
+        image_msg_id = context.user_data.pop("image_message_id", None)
+        if image_msg_id:
             try:
-                await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=old_msg_id)
-            except:
-                pass
+                await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=image_msg_id)
+            except Exception as e:
+                print("Image delete failed:", e)
 
+        # Show confirmation dialog
         confirm_markup = InlineKeyboardMarkup([
-            [InlineKeyboardButton("✅ Ja", callback_data="confirm_delete")],
-            [InlineKeyboardButton("❌ Nein", callback_data="back_to_menu")]
+            [InlineKeyboardButton("✅ Ja, löschen", callback_data="confirm_delete")],
+            [InlineKeyboardButton("❌ Abbrechen", callback_data="cancel_delete")]
         ])
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f"⚠️ Möchtest du Meldung #{mid} wirklich löschen?",
+        
+        await query.edit_message_text(
+            text=f"⚠️ Möchtest du Meldung #{mid} wirklich löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.",
             reply_markup=confirm_markup
         )
 
-
     elif data == "confirm_delete":
         mid = context.user_data.pop("pending_delete", None)
-        if mid is not None and await asyncio.to_thread(delete_meldung, mid):
-            meldungen = context.user_data.get("meldungen", [])
-            index = context.user_data.get("meldung_index", 0)
+        if mid is not None:
+            # Delete from database (only if user owns it)
+            success = await asyncio.to_thread(delete_user_meldung, mid, user_id)
+            if success:
+                # Update meldungen list in context
+                meldungen = context.user_data.get("meldungen", [])
+                index = context.user_data.get("meldung_index", 0)
 
-            # Remove the deleted one
-            meldungen = [m for m in meldungen if m["id"] != mid]
-            context.user_data["meldungen"] = meldungen
+                # Remove the deleted meldung from the list
+                meldungen = [m for m in meldungen if m["id"] != mid]
+                context.user_data["meldungen"] = meldungen
 
-            if not meldungen:
-                await query.edit_message_text("✅ Meldung gelöscht. Du hast keine weiteren Meldungen.", reply_markup=build_main_menu())
+                if not meldungen:
+                    # No more meldungen left
+                    await query.edit_message_text(
+                        "✅ Meldung erfolgreich gelöscht.\n\nDu hast keine weiteren Meldungen.", 
+                        reply_markup=build_main_menu()
+                    )
+                else:
+                    # Adjust index if needed
+                    if index >= len(meldungen):
+                        context.user_data["meldung_index"] = max(0, len(meldungen) - 1)
+                    
+                    # Show success message briefly, then show next meldung
+                    await query.edit_message_text("✅ Meldung erfolgreich gelöscht.")
+                    
+                    # Wait a moment then show the next meldung
+                    await asyncio.sleep(1)
+                    await show_meldung(update, context)
             else:
-                # Adjust index if needed
-                if index >= len(meldungen):
-                    context.user_data["meldung_index"] = max(0, len(meldungen) - 1)
-                await show_meldung(update, context)
+                await query.edit_message_text(
+                    "❌ Fehler beim Löschen der Meldung oder du bist nicht der Besitzer dieser Meldung.", 
+                    reply_markup=build_main_menu()
+                )
         else:
-            await query.edit_message_text("❌ Fehler beim Löschen oder keine Meldung ausgewählt.", reply_markup=build_main_menu())
+            await query.edit_message_text(
+                "❌ Keine Meldung zum Löschen ausgewählt.", 
+                reply_markup=build_main_menu()
+            )
 
+    elif data == "cancel_delete":
+        # Cancel delete operation and go back to showing the meldung
+        context.user_data.pop("pending_delete", None)
+        await show_meldung(update, context)
 
     elif data == "back_to_menu":
-        from bot.start import handle_start
+        from bot.handlers.start import handle_start
         await handle_start(update, context)
         context.user_data.clear()
 
@@ -302,10 +327,15 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Navigation + actions
     keyboard = []
+    nav_row = []
+    
     if index > 0:
-        keyboard.append([InlineKeyboardButton("⬅️ Zurück", callback_data="prev_meldung")])
+        nav_row.append(InlineKeyboardButton("⬅️ Zurück", callback_data="prev_meldung"))
     if index < total - 1:
-        keyboard.append([InlineKeyboardButton("Weiter ➡️", callback_data="next_meldung")])
+        nav_row.append(InlineKeyboardButton("Weiter ➡️", callback_data="next_meldung"))
+    
+    if nav_row:
+        keyboard.append(nav_row)
 
     if m.get("image_url"):
         toggle_label = "❌ Bild ausblenden" if context.user_data.get("image_message_id") else "📸 Bild ansehen"
@@ -316,5 +346,5 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     markup = InlineKeyboardMarkup(keyboard)
 
-    # ✨ Trigger vanish by editing same message
+    # Edit the message to show the meldung
     await query.edit_message_text(text=caption, reply_markup=markup)

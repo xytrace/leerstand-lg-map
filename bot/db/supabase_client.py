@@ -152,12 +152,26 @@ def confirm_meldung(mid: int) -> bool:
     return True
 
 
-def delete_meldung(mid: int) -> bool:
-    res = supabase.table("meldungen").select("image_url").eq("id", mid).limit(1).execute()
+def delete_meldung(mid: int, user_id: int = None) -> bool:
+    """
+    Delete a meldung. If user_id is provided, only allows deletion if the user owns the meldung.
+    If user_id is None, allows deletion (for admin use).
+    """
+    # Build query
+    query = supabase.table("meldungen").select("image_url, user_id").eq("id", mid).limit(1)
+    res = query.execute()
+    
     if not res.data:
         return False
 
-    url = res.data[0]["image_url"]
+    meldung = res.data[0]
+    
+    # Check if user_id is provided and if the user owns this meldung
+    if user_id is not None and meldung["user_id"] != user_id:
+        return False  # User doesn't own this meldung
+    
+    # Delete the image if it exists
+    url = meldung["image_url"]
     if url:
         path = url.split("/object/public/")[-1]
         try:
@@ -165,5 +179,20 @@ def delete_meldung(mid: int) -> bool:
         except Exception as e:
             print(f"Image deletion failed: {e}")
 
+    # Delete the meldung from database
     supabase.table("meldungen").delete().eq("id", mid).execute()
     return True
+
+
+def delete_user_meldung(mid: int, user_id: int) -> bool:
+    """
+    Delete a meldung, but only if it belongs to the specified user.
+    """
+    return delete_meldung(mid, user_id)
+
+
+def admin_delete_meldung(mid: int) -> bool:
+    """
+    Admin function to delete any meldung (no user restriction).
+    """
+    return delete_meldung(mid, user_id=None)
