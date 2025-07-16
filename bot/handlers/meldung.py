@@ -225,11 +225,10 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
     elif data == "confirm_delete":
         mid = context.user_data.pop("pending_delete", None)
         print(f"DEBUG: Attempting to delete meldung ID: {mid}")
-        print(f"DEBUG: Current meldungen in context: {[m['id'] for m in context.user_data.get('meldungen', [])]}")
         
         if mid is not None:
             try:
-                # Delete from Supabase
+                # Delete from Supabase - try without asyncio.to_thread first
                 delete_success = delete_meldung(mid)
                 print(f"DEBUG: Delete result: {delete_success}")
                 
@@ -247,11 +246,10 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
                         try:
                             await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=image_msg_id)
                         except Exception as e:
-                            print(f"DEBUG: Image delete failed: {e}")
+                            print("Image delete failed:", e)
                     
                     if not meldungen:
                         # No more meldungen
-                        print("DEBUG: No more meldungen, showing main menu")
                         await query.edit_message_text(
                             "✅ Meldung gelöscht. Du hast keine weiteren Meldungen.",
                             reply_markup=build_main_menu()
@@ -259,30 +257,23 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
                     else:
                         # Adjust index and show next/previous meldung
                         current_index = context.user_data.get("meldung_index", 0)
-                        print(f"DEBUG: Current index: {current_index}, new count: {len(meldungen)}")
                         if current_index >= len(meldungen):
                             context.user_data["meldung_index"] = len(meldungen) - 1
-                            print(f"DEBUG: Adjusted index to: {context.user_data['meldung_index']}")
                         
                         # Show next meldung directly
-                        print("DEBUG: Showing next meldung")
                         await show_meldung(update, context)
                 else:
-                    print("DEBUG: Delete failed, showing error")
                     await query.edit_message_text(
                         "❌ Fehler beim Löschen der Meldung aus der Datenbank.",
                         reply_markup=build_main_menu()
                     )
             except Exception as e:
                 print(f"DEBUG: Exception during deletion: {e}")
-                import traceback
-                traceback.print_exc()
                 await query.edit_message_text(
                     f"❌ Fehler beim Löschen: {str(e)}",
                     reply_markup=build_main_menu()
                 )
         else:
-            print("DEBUG: No pending delete ID found")
             await query.edit_message_text(
                 "❌ Keine Meldung zum Löschen ausgewählt.",
                 reply_markup=build_main_menu()
