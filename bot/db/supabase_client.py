@@ -170,7 +170,7 @@ def delete_meldung(mid: str) -> bool:
             logger.info(f"[DELETE] Attempting to remove image from storage: {path}")
 
             try:
-                supabase.storage.from_(SUPABASE_BUCKET).remove([path])
+                supabase.storage.from_(SUPABASE_BUCKET).remove([path]).execute()
                 logger.info(f"[DELETE] Image removed: {path}")
             except Exception as e:
                 logger.error(f"[DELETE] Image deletion failed: {e}")
