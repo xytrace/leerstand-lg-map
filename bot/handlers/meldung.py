@@ -223,14 +223,21 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
         context.user_data["pending_delete"] = mid
         logger.info(f"[DELETE REQUEST] Meldung ID {mid} requested for deletion by user {user_id}")
 
-        # Show confirmation message
+        # Lookup the meldung by ID to get the address
+        meldung = next((m for m in context.user_data.get("meldungen", []) if m["id"] == mid), None)
+        adresse = meldung["adresse"] if meldung else "Unbekannt"
+
+        # Short ID for nicer formatting
+        short_id = mid.split("-")[0]
+
         confirm_markup = InlineKeyboardMarkup([
             [InlineKeyboardButton("✅ Ja, löschen", callback_data="confirm_delete")],
             [InlineKeyboardButton("❌ Abbrechen", callback_data="cancel_delete")]
         ])
+
         try:
             await query.edit_message_text(
-                text=f"⚠️ Möchtest du Meldung #{mid} wirklich löschen?",
+                text=f"⚠️ Möchtest du Meldung #{short_id}\n{adresse}\nwirklich löschen?",
                 reply_markup=confirm_markup
             )
             logger.info(f"[CONFIRM SHOWN] Deletion confirmation sent for Meldung ID {mid}")
