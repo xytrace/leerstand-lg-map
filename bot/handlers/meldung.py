@@ -237,7 +237,7 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
 
         try:
             await query.edit_message_text(
-                text=f"⚠️ Möchtest du Meldung #{short_id}\n{adresse}\nwirklich löschen?",
+                text=f"⚠️ Möchtest du die folgende Meldung wirklich löschen?\n\n{adresse}",
                 reply_markup=confirm_markup
             )
             logger.info(f"[CONFIRM SHOWN] Deletion confirmation sent for Meldung ID {mid}")
@@ -337,7 +337,7 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     caption = (
         f"📋 Meldung {index+1}/{total}\n\n"
-        f"#{m['id'].split('-')[0]}\n{m['adresse']}\n"
+        f"{m['adresse']}\n"
         f"🏠 Lage: {m['wohnungslage']}\n"
         f"⏰ Dauer: {m['dauer']}\n"
         f"✅ Bestätigt: {m['bestaetigungen']}x"
