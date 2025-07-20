@@ -330,7 +330,7 @@ async def show_meldung(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     caption = (
         f"📋 Meldung {index+1}/{total}\n\n"
-        f"#{m['id']} – {m['adresse']}\n"
+        f"#{m['id'].split('-')[0]}\n{m['adresse']}\n"
         f"🏠 Lage: {m['wohnungslage']}\n"
         f"⏰ Dauer: {m['dauer']}\n"
         f"✅ Bestätigt: {m['bestaetigungen']}x"
