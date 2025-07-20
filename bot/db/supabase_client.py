@@ -169,11 +169,11 @@ def delete_meldung(mid: str) -> bool:
             path = url.split("/object/public/")[-1].split("?")[0]  # strip query string if present
             logger.info(f"[DELETE] Attempting to remove image from storage: {path}")
 
-            try:
-                supabase.storage.from_(SUPABASE_BUCKET).remove([path]).execute()
-                logger.info(f"[DELETE] Image removed: {path}")
-            except Exception as e:
-                logger.error(f"[DELETE] Image deletion failed: {e}")
+        try:
+            result = supabase.storage.from_(SUPABASE_BUCKET).remove([path])
+            logger.info(f"[DELETE] Image removed from storage: {path}, result: {result}")
+        except Exception as e:
+            logger.error(f"[DELETE] Image deletion failed: {e}")
 
         # Delete the row itself
         delete_result = supabase.table("meldungen").delete().eq("id", mid).execute()
