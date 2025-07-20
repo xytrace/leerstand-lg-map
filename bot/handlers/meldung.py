@@ -3,12 +3,16 @@ import uuid
 import re
 import telegram
 import asyncio
+import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 from bot.db.supabase_client import get_or_create_user, add_points, save_meldung, get_user_meldungen, supabase, delete_meldung
 from bot.util.helpers import build_main_menu, build_back_menu
 from bot.util.geocode import geocode_address
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def validate_address(addr: str):
@@ -125,13 +129,19 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    await query.answer()
+    data = query.data
     tg_user = update.effective_user
+
+    logger.info(f"[CALLBACK] User {tg_user.id} clicked: {data}")
+
+    await query.answer()
+
     telegram_id, alias, user_id = await get_or_create_user(tg_user.id, tg_user.username or "")
     context.user_data["user_id"] = user_id
 
-    data = query.data
-    context.user_data["callback_data"] = data
+    # Log internal state
+    logger.info(f"[STATE] User ID: {user_id}, Alias: {alias}, Callback Data: {data}")
+
 
     if data == "neue_meldung":
         if not alias:
@@ -211,16 +221,22 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
     elif data.startswith("delete_"):
         mid = int(data.split("_")[1])
         context.user_data["pending_delete"] = mid
-        
+        logger.info(f"[DELETE REQUEST] Meldung ID {mid} requested for deletion by user {user_id}")
+
         # Show confirmation message
         confirm_markup = InlineKeyboardMarkup([
             [InlineKeyboardButton("✅ Ja, löschen", callback_data="confirm_delete")],
             [InlineKeyboardButton("❌ Abbrechen", callback_data="cancel_delete")]
         ])
-        await query.edit_message_text(
-            text=f"⚠️ Möchtest du Meldung #{mid} wirklich löschen?",
-            reply_markup=confirm_markup
-        )
+        try:
+            await query.edit_message_text(
+                text=f"⚠️ Möchtest du Meldung #{mid} wirklich löschen?",
+                reply_markup=confirm_markup
+            )
+            logger.info(f"[CONFIRM SHOWN] Deletion confirmation sent for Meldung ID {mid}")
+        except Exception as e:
+            logger.error(f"[ERROR] Failed to send confirmation message: {e}")
+
 
     elif data == "confirm_delete":
         mid = context.user_data.pop("pending_delete", None)
