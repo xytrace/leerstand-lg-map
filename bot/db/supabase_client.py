@@ -6,6 +6,9 @@ import re
 from datetime import datetime
 from supabase import create_client, Client
 import asyncio
+import logging
+logger = logging.getLogger(__name__)
+
 
 with open("config.json") as f:
     config = json.load(f)
@@ -153,17 +156,32 @@ def confirm_meldung(mid: int) -> bool:
 
 
 def delete_meldung(mid: str) -> bool:
-    res = supabase.table("meldungen").select("image_url").eq("id", mid).limit(1).execute()
-    if not res.data:
+    logger.info(f"[DELETE] Starting deletion for Meldung ID {mid}")
+
+    try:
+        res = supabase.table("meldungen").select("image_url").eq("id", mid).limit(1).execute()
+        if not res.data:
+            logger.warning(f"[DELETE] No meldung found with ID {mid}")
+            return False
+
+        url = res.data[0]["image_url"]
+        if url:
+            path = url.split("/object/public/")[-1].split("?")[0]  # strip query string if present
+            logger.info(f"[DELETE] Attempting to remove image from storage: {path}")
+
+            try:
+                supabase.storage.from_(SUPABASE_BUCKET).remove([path])
+                logger.info(f"[DELETE] Image removed: {path}")
+            except Exception as e:
+                logger.error(f"[DELETE] Image deletion failed: {e}")
+
+        # Delete the row itself
+        delete_result = supabase.table("meldungen").delete().eq("id", mid).execute()
+        logger.info(f"[DELETE] Meldung {mid} deleted from database")
+
+        return True
+
+    except Exception as e:
+        logger.error(f"[DELETE] Unexpected error during deletion of Meldung {mid}: {e}")
         return False
 
-    url = res.data[0]["image_url"]
-    if url:
-        path = url.split("/object/public/")[-1]
-        try:
-            supabase.storage.from_(SUPABASE_BUCKET).remove([path])
-        except Exception as e:
-            print(f"Image deletion failed: {e}")
-
-    supabase.table("meldungen").delete().eq("id", mid).execute()
-    return True
