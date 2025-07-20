@@ -152,7 +152,7 @@ def confirm_meldung(mid: int) -> bool:
     return True
 
 
-def delete_meldung(mid: int) -> bool:
+def delete_meldung(mid: str) -> bool:
     res = supabase.table("meldungen").select("image_url").eq("id", mid).limit(1).execute()
     if not res.data:
         return False

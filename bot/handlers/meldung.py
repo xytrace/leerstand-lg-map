@@ -219,7 +219,7 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
         await query.edit_message_text("⏰ Wie lange steht die Wohnung schon leer?")
 
     elif data.startswith("delete_"):
-        mid = int(data.split("_")[1])
+        mid = data.split("_", 1)[1]
         context.user_data["pending_delete"] = mid
         logger.info(f"[DELETE REQUEST] Meldung ID {mid} requested for deletion by user {user_id}")
 
@@ -241,7 +241,6 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
     elif data == "confirm_delete":
         mid = context.user_data.pop("pending_delete", None)
         if mid is not None:
-            # Delete from Supabase
             delete_success = await asyncio.to_thread(delete_meldung, mid)
             
             if delete_success:
