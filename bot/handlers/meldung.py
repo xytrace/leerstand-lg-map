@@ -14,18 +14,6 @@ from bot.util.geocode import geocode_address
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-async def reply_and_track(update, context, text, **kwargs):
-    msg = await update.message.reply_text(text, **kwargs)
-    await track_message(update, context, msg.message_id)
-    return msg
-
-
-# Store message IDs to later delete them
-def track_message(context, message):
-    if "to_cleanup" not in context.user_data:
-        context.user_data["to_cleanup"] = []
-    context.user_data["to_cleanup"].append(message.message_id)
-
 
 def validate_address(addr: str):
     if not re.match(r"^[^\d]+ \d+[a-zA-Z]?$", addr.strip()):
@@ -34,7 +22,6 @@ def validate_address(addr: str):
 
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    track_message(context, update.message)
     text = update.message.text.strip()
     tg_user = update.effective_user
     telegram_id, alias, user_id = await get_or_create_user(tg_user.id, tg_user.username or "")
@@ -42,11 +29,11 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if context.user_data.get("waiting_for_name"):
         if len(text) < 2 or len(text) > 30:
-            await reply_and_track(update, context, "❌ Der Username muss zwischen 2 und 30 Zeichen lang sein.\nBitte versuche es erneut:")
+            await update.message.reply_text("❌ Der Username muss zwischen 2 und 30 Zeichen lang sein.\nBitte versuche es erneut:")
             return
         supabase.table("users").update({"alias": text}).eq("id", user_id).execute()
         context.user_data["waiting_for_name"] = False
-        await reply_and_track(update, context, f"Perfekt, {text}! ✅\n\nBitte gib nun die Adresse des Leerstands ein:")
+        await update.message.reply_text(f"Perfekt, {text}! ✅\n\nBitte gib nun die Adresse des Leerstands ein:")
         context.user_data["meldung_step"] = "adresse"
         return
 
@@ -54,7 +41,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if step == "adresse":
         context.user_data["adresse"] = text
-        loading_msg = await reply_and_track(update, context, "📍 Adresse wird überprüft … ⏳")
+        loading_msg = await update.message.reply_text("📍 Adresse wird überprüft … ⏳")
 
         lat, lon = await geocode_address(text)
         if lat is None or lon is None:
@@ -69,24 +56,24 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("Vorderhaus", callback_data="wl_vh"), InlineKeyboardButton("Hinterhaus", callback_data="wl_hh")],
             [InlineKeyboardButton("Sonstige", callback_data="wl_sonstige")]
         ]
-        await reply_and_track(update, context, "🏠 Wo befindet sich die Wohnung?", reply_markup=InlineKeyboardMarkup(keyboard))
+        await update.message.reply_text("🏠 Wo befindet sich die Wohnung?", reply_markup=InlineKeyboardMarkup(keyboard))
         context.user_data["meldung_step"] = "wohnungslage"
 
     elif step == "wohnungslage_og":
         if re.match(r"^\d+$", text.strip()):
             context.user_data["wohnungslage"] = f"{text.strip()}. OG"
-            await reply_and_track(update, context, 
+            await update.message.reply_text(
                 "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Überspringen", callback_data="skip_photo")]])
             )
             context.user_data["meldung_step"] = "foto"
         else:
-            await reply_and_track(update, context, "❌ Bitte gib eine gültige Zahl für das Stockwerk an (z.B. 3 für 3. OG):")
+            await update.message.reply_text("❌ Bitte gib eine gültige Zahl für das Stockwerk an (z.B. 3 für 3. OG):")
             return
 
     elif step == "wohnungslage_sonstige":
         context.user_data["wohnungslage"] = text
-        await reply_and_track(update, context, 
+        await update.message.reply_text(
             "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Überspringen", callback_data="skip_photo")]])
         )
@@ -118,24 +105,15 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"🏠 *Lage:* {wohnungslage}\n⏰ *Dauer:* {dauer}\n\nDanke! (+5 Punkte)"
             )
 
-        # Clean previous interaction messages
-        for msg_id in context.user_data.get("to_cleanup", []):
-            try:
-                await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=msg_id)
-            except Exception as e:
-                logger.warning(f"Couldn't delete message {msg_id}: {e}")
-        context.user_data.pop("to_cleanup", None)
-
-        await reply_and_track(update, context, msg, parse_mode="Markdown", reply_markup=build_main_menu())
+        await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=build_main_menu())
         context.user_data.clear()
 
     else:
-        await reply_and_track(update, context, "Bitte benutze die Buttons im Menü:", reply_markup=build_main_menu())
+        await update.message.reply_text("Bitte benutze die Buttons im Menü:", reply_markup=build_main_menu())
 
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    track_message(context, update.message)
     if context.user_data.get("meldung_step") == "foto":
         file = await update.message.photo[-1].get_file()
         local_dir = "/tmp"
@@ -143,10 +121,10 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         path = os.path.join(local_dir, fname)
         await file.download_to_drive(path)
         context.user_data["img_path"] = path
-        await reply_and_track(update, context, "⏰ Wie lange steht die Wohnung schon leer?")
+        await update.message.reply_text("⏰ Wie lange steht die Wohnung schon leer?")
         context.user_data["meldung_step"] = "dauer"
     else:
-        await reply_and_track(update, context, "Bitte beginne zuerst eine neue Meldung über das Menü.")
+        await update.message.reply_text("Bitte beginne zuerst eine neue Meldung über das Menü.")
 
 
 async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -259,7 +237,7 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
 
         try:
             await query.edit_message_text(
-                text=f"⚠️ Möchtest du die folgende Meldung wirklich löschen?\n\n{adresse}",
+            text=f"⚠️ Möchtest du die folgende Meldung wirklich löschen?\n\n{adresse}",
                 reply_markup=confirm_markup
             )
             logger.info(f"[CONFIRM SHOWN] Deletion confirmation sent for Meldung ID {mid}")
