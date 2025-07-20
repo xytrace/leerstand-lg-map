@@ -14,6 +14,12 @@ from bot.util.geocode import geocode_address
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Store message IDs to later delete them
+def track_message(context, message):
+    if "to_cleanup" not in context.user_data:
+        context.user_data["to_cleanup"] = []
+    context.user_data["to_cleanup"].append(message.message_id)
+
 
 def validate_address(addr: str):
     if not re.match(r"^[^\d]+ \d+[a-zA-Z]?$", addr.strip()):
@@ -22,6 +28,7 @@ def validate_address(addr: str):
 
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    track_message(context, update.message)
     text = update.message.text.strip()
     tg_user = update.effective_user
     telegram_id, alias, user_id = await get_or_create_user(tg_user.id, tg_user.username or "")
@@ -105,16 +112,15 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"🏠 *Lage:* {wohnungslage}\n⏰ *Dauer:* {dauer}\n\nDanke! (+5 Punkte)"
             )
 
-        # Send final confirmation
-        final_msg = await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=build_main_menu())
-
-        # Delete all previous user and bot messages from the flow
-        for msg_id in context.user_data.get("temp_messages", []):
+        # Clean previous interaction messages
+        for msg_id in context.user_data.get("to_cleanup", []):
             try:
                 await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=msg_id)
             except Exception as e:
-                logger.warning(f"[CLEANUP] Couldn't delete message {msg_id}: {e}")
+                logger.warning(f"Couldn't delete message {msg_id}: {e}")
+        context.user_data.pop("to_cleanup", None)
 
+        await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=build_main_menu())
         context.user_data.clear()
 
     else:
@@ -123,6 +129,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    track_message(context, update.message)
     if context.user_data.get("meldung_step") == "foto":
         file = await update.message.photo[-1].get_file()
         local_dir = "/tmp"
