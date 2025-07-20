@@ -105,7 +105,16 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"🏠 *Lage:* {wohnungslage}\n⏰ *Dauer:* {dauer}\n\nDanke! (+5 Punkte)"
             )
 
-        await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=build_main_menu())
+        # Send final confirmation
+        final_msg = await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=build_main_menu())
+
+        # Delete all previous user and bot messages from the flow
+        for msg_id in context.user_data.get("temp_messages", []):
+            try:
+                await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=msg_id)
+            except Exception as e:
+                logger.warning(f"[CLEANUP] Couldn't delete message {msg_id}: {e}")
+
         context.user_data.clear()
 
     else:
