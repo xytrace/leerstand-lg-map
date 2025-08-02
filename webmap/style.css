@@ -75,6 +75,13 @@ body {
   }
 }
 
+/* Make header elements show pointer on hover */
+.header img,
+.header h1 span {
+  cursor: pointer;
+}
+
+
 /* Leaflet popup content font */
 .leaflet-popup-content {
   font-family: 'Inter', sans-serif;
