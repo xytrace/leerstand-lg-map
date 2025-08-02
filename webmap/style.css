@@ -7,12 +7,14 @@ body {
 .page-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100vh;
 }
 
 .main-map {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
+  overflow: hidden;
 }
 
 #map {
