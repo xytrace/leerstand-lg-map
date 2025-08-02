@@ -40,7 +40,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data.clear()
     elif data == 'noop':
         pass
-    #else:
-        #context.user_data['callback_data'] = data
-        #from . import meldung
-        #await meldung.handle_button_callback(update, context)
+    else:
+        context.user_data['callback_data'] = data
+        from . import meldung
+        await meldung.handle_button_callback(update, context)

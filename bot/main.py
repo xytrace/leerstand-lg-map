@@ -34,7 +34,7 @@ app.add_handler(CommandHandler("bestaetige", handle_confirm))
 
 # Split callback handlers properly
 app.add_handler(CallbackQueryHandler(handle_buttons, pattern="^(back_to_menu|noop)$"))
-app.add_handler(CallbackQueryHandler(handle_button_callback))
+app.add_handler(CallbackQueryHandler(handle_button_callback, pattern=r"^wl_.*"))
 
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
