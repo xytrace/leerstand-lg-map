@@ -17,32 +17,35 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="page-container">
 
-  <!-- Header -->
-  <header class="header">
-    <div class="logo-left">
-      <img src="assets/Leerstandsbot_Logo.svg" alt="Leerstandsbot Logo" onclick="window.open('https://t.me/LeerstandsmelderBot', '_blank')" />
-    </div>
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-left">
+        <img src="assets/Leerstandsbot_Logo.svg" alt="Leerstandsbot Logo" onclick="window.open('https://t.me/LeerstandsmelderBot', '_blank')" />
+      </div>
 
-    <h1>
-      <span onclick="location.href='index.html'">Leerstandsbot Karte</span>
-    </h1>
+      <h1>
+        <span onclick="location.href='index.html'">Leerstandsbot Karte</span>
+      </h1>
 
-    <div class="logo-right">
-      <img src="assets/KV_LG_Logo.svg" alt="KV Lüneburg Logo" onclick="window.open('https://www.dielinke-lueneburg.de/', '_blank')" />
-    </div>
-  </header>
+      <div class="logo-right">
+        <img src="assets/KV_LG_Logo.svg" alt="KV Lüneburg Logo" onclick="window.open('https://www.dielinke-lueneburg.de/', '_blank')" />
+      </div>
+    </header>
 
-  <!-- Main content area -->
-  <main id="main-container">
-    <div id="map"></div>
-  </main>
+    <!-- Main content area -->
+    <main class="main-map">
+      <div id="map"></div>
+    </main>
 
-  <!-- Footer -->
-  <footer>
-    <a href="impressum.html" target="_blank">Impressum</a> |
-    <a href="datenschutz.html" target="_blank">Datenschutz</a>
-  </footer>
+    <!-- Footer -->
+    <footer>
+      <a href="impressum.html" target="_blank">Impressum</a> |
+      <a href="datenschutz.html" target="_blank">Datenschutz</a>
+    </footer>
+
+  </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
