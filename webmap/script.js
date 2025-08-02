@@ -1,4 +1,4 @@
-const config = await (await fetch("config.json")).json();  // already fixed path
+const config = await (await fetch("../config.json")).json(); 
 const SUPABASE_URL = config.supabase_url;
 const SUPABASE_API_KEY = config.supabase_key;
 const TABLE_NAME = config.supabase_table || "meldungen";
