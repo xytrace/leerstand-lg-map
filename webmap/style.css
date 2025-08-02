@@ -78,3 +78,23 @@ body {
   font-weight: 900;
   font-size: 15px;
 }
+
+/* Footer */
+footer {
+  background-color: #c62828; /* red */
+  color: white;
+  font-family: 'Work Sans', 'Inter', sans-serif;
+  font-size: 8pt;
+  text-align: center;
+  padding: 8px 0;
+}
+
+footer a {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
