@@ -41,11 +41,6 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == 'noop':
         pass
     else:
-        # ✅ Let the router in main.py handle everything else
-        # 🔁 How? Re-dispatch the query:
-        from telegram.ext import CallbackQueryHandler
-
-        # re-dispatch this callback manually to the fallback handler
-        handler = CallbackQueryHandler(handle_button_callback)
-        await handler.callback(update, context)
-
+        context.user_data['callback_data'] = data
+        from . import meldung
+        await meldung.handle_button_callback(update, context)

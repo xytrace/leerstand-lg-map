@@ -325,7 +325,15 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
     elif data.startswith("wl_"):
         val = data[3:]
 
-        if val == "og":
+        if val == "eg":
+            context.user_data["wohnungslage"] = "EG"
+            await query.edit_message_text(
+                "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🚫 Überspringen", callback_data="skip_photo")]])
+            )
+            context.user_data["meldung_step"] = "foto"
+
+        elif val == "og":
             await query.edit_message_text("🌀 Welches Stockwerk? (z.B. 3 für 3. OG)")
             context.user_data["meldung_step"] = "wohnungslage_og"
 
@@ -333,31 +341,33 @@ async def handle_button_callback(update: Update, context: ContextTypes.DEFAULT_T
             await query.edit_message_text("Bitte beschreibe die Lage der Wohnung.")
             context.user_data["meldung_step"] = "wohnungslage_sonstige"
 
-        elif val in ("vh", "hh"):
+        elif val == "vh" or val == "hh":
             context.user_data["hauslage"] = "Vorderhaus" if val == "vh" else "Hinterhaus"
             keyboard = [
                 [InlineKeyboardButton("EG", callback_data="wl_eg_from_hauslage"),
-                InlineKeyboardButton("OG", callback_data="wl_og_from_hauslage")],
+                 InlineKeyboardButton("OG", callback_data="wl_og_from_hauslage")],
                 [InlineKeyboardButton("Sonstige", callback_data="wl_sonstige_from_hauslage")]
             ]
-            await query.edit_message_text(f"🔢 Welches Stockwerk im {context.user_data['hauslage']}?", reply_markup=InlineKeyboardMarkup(keyboard))
+            await query.edit_message_text(
+                f"🔢 Welches Stockwerk im {context.user_data['hauslage']}?",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
 
-    elif data == "wl_eg_from_hauslage":
-        context.user_data["wohnungslage"] = f"{context.user_data['hauslage']}, EG"
-        await query.edit_message_text(
-            "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🚫 Überspringen", callback_data="skip_photo")]])
-        )
-        context.user_data["meldung_step"] = "foto"
+        elif val == "eg_from_hauslage":
+            context.user_data["wohnungslage"] = f"{context.user_data['hauslage']}, EG"
+            await query.edit_message_text(
+                "📸 Optional: Schicke ein Foto oder tippe auf 'Überspringen':",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🚫 Überspringen", callback_data="skip_photo")]])
+            )
+            context.user_data["meldung_step"] = "foto"
 
-    elif data == "wl_og_from_hauslage":
-        await query.edit_message_text("🌀 Welches Stockwerk?")
-        context.user_data["meldung_step"] = "wohnungslage_og_from_hauslage"
+        elif val == "og_from_hauslage":
+            await query.edit_message_text("🌀 Welches Stockwerk?")
+            context.user_data["meldung_step"] = "wohnungslage_og_from_hauslage"
 
-    elif data == "wl_sonstige_from_hauslage":
-        await query.edit_message_text("Bitte beschreibe die Lage der Wohnung.")
-        context.user_data["meldung_step"] = "wohnungslage_sonstige_from_hauslage"
-
+        elif val == "sonstige_from_hauslage":
+            await query.edit_message_text("Bitte beschreibe die Lage der Wohnung.")
+            context.user_data["meldung_step"] = "wohnungslage_sonstige_from_hauslage"
 
     elif data == "noop":
         pass
