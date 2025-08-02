@@ -1,4 +1,5 @@
 /config.json
+/webmap/config.json
 /bot.py
 /venv/
 __pycache__/
