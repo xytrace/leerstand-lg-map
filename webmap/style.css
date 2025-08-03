@@ -22,12 +22,14 @@ body {
 
 /* Header bar */
 .header {
+  position: sticky;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: white;
   padding: 0em 1em;
   border-bottom: 2px solid #ccc;
+  z-index: 1004;
 }
 
 /* Logo containers */
@@ -131,14 +133,14 @@ body {
 
 /* Hamburger button */
 .menu-button {
-  position: absolute;
+  position: sticky;
   top: 80px;
   left: 10px;
   font-size: 28px;
   background: white;
   padding: 6px 12px;
   border-radius: 8px;
-  z-index: 1003;
+  z-index: 1005;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   cursor: pointer;
 }
