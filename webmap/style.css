@@ -4,6 +4,14 @@ body {
   font-family: 'Work Sans', sans-serif;
 }
 
+body.is-index .menu-button {
+  position: fixed;
+  top: 80px; /* adjust as needed */
+  left: 10px;
+  margin-left: 0;
+}
+
+
 .page-container {
   display: flex;
   flex-direction: column;
