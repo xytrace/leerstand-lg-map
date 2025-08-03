@@ -225,5 +225,5 @@ body.is-index .menu-button {
   flex-direction: column-reverse;
   align-items: flex-end;
   gap: 6px;
-  top: 20px; /* push the whole control group down below header */
+  top: 0dvh;
 }
