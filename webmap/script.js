@@ -56,7 +56,7 @@ fetchMeldungen();
 setInterval(fetchMeldungen, 10000); // every 10 seconds
 
 // --- Move zoom control to bottom right
-map.zoomControl.setPosition("bottomright");
+map.zoomControl.setPosition("topright");
 
 // --- Add Home button above zoom controls
 L.Control.Home = L.Control.extend({
