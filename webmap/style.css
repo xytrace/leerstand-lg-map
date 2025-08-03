@@ -221,6 +221,9 @@ body.is-index .menu-button {
 
 
 .leaflet-top.leaflet-right {
-  top: 80px; /* pushes controls down below header */
-  right: 10px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 6px;
+  top: 20px; /* push the whole control group down below header */
 }
