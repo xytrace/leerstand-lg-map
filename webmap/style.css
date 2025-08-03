@@ -156,7 +156,7 @@ body {
   height: 100vh;
   background-color: white;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
-  padding: 20px 15px;
+  padding: 25dvh 15px 20px;
   z-index: 1002;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
@@ -166,7 +166,6 @@ body {
 
 #menu-overlay.open {
   transform: translateX(0);
-  padding-top: 25dvh
 }
 
 #menu-backdrop {
