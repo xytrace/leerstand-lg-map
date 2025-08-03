@@ -179,11 +179,6 @@ body {
   display: block;
 }
 
-
-#menu-overlay.open {
-  transform: translateX(0);
-}
-
 /* Menu items */
 #menu-overlay ul {
   list-style: none;
@@ -193,6 +188,14 @@ body {
 
 #menu-overlay li {
   margin-bottom: 14px;
+}
+
+#menu-overlay .top-entry {
+  padding-top: 0;
+}
+
+#menu-overlay .spaced-entries {
+  padding-top: 25dvh;
 }
 
 #menu-overlay a,
