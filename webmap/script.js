@@ -54,3 +54,44 @@ async function fetchMeldungen() {
 
 fetchMeldungen();
 setInterval(fetchMeldungen, 10000); // every 10 seconds
+
+// --- Move zoom control to bottom right
+map.zoomControl.setPosition("bottomright");
+
+// --- Add Home button above zoom controls
+L.Control.Home = L.Control.extend({
+  onAdd: function (map) {
+    const btn = L.DomUtil.create("button", "leaflet-bar leaflet-control leaflet-control-custom");
+    btn.innerHTML = "🏠";
+    btn.title = "Zur Startansicht";
+    btn.style.width = "34px";
+    btn.style.height = "34px";
+    btn.style.fontSize = "18px";
+    btn.style.lineHeight = "30px";
+    btn.style.textAlign = "center";
+    btn.style.cursor = "pointer";
+    btn.style.backgroundColor = "white";
+
+    L.DomEvent.on(btn, "click", () => {
+      map.setView([53.246, 10.414], 13);
+    });
+
+    return btn;
+  }
+});
+L.control.home = function (opts) {
+  return new L.Control.Home(opts);
+};
+L.control.home({ position: "bottomright" }).addTo(map);
+
+// --- Hamburger menu toggle logic
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("menu-toggle");
+  const overlay = document.getElementById("menu-overlay");
+  if (toggle && overlay) {
+    toggle.addEventListener("click", () => {
+      overlay.classList.toggle("menu-hidden");
+    });
+  }
+});
+

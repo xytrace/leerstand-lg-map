@@ -96,26 +96,6 @@ body {
   font-size: 15px;
 }
 
-/* Footer */
-footer {
-  background-color: #FF0000; /* red */
-  color: white;
-  font-family: 'Inter', sans-serif;
-  font-size: 10pt;
-  text-align: center;
-  padding: 2px 0;
-}
-
-footer a {
-  color: white;
-  text-decoration: none;
-  margin: 0 10px;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
-
 .text-content {
   font-family: 'Inter', sans-serif;
   font-size: 15px;
@@ -134,4 +114,75 @@ footer a:hover {
 
 .text-content a {
   color: black;
+}
+
+/* ----------------------------------------
+   🧭 MAP MENU + HOME BUTTON
+---------------------------------------- */
+
+/* Floating hamburger button */
+.menu-button {
+  position: absolute;
+  top: 80px;
+  left: 10px;
+  font-size: 28px;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  z-index: 1001;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+
+/* Dropdown overlay for menu */
+#menu-overlay {
+  position: absolute;
+  top: 120px;
+  left: 10px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  padding: 12px;
+  z-index: 1000;
+  width: 200px;
+}
+
+#menu-overlay ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#menu-overlay li {
+  margin-bottom: 10px;
+}
+
+#menu-overlay a,
+#menu-overlay button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+  color: black;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.menu-hidden {
+  display: none;
+}
+
+/* Leaflet custom home button above zoom controls */
+.leaflet-control-custom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+/* Optional hover effect */
+.leaflet-control-custom:hover {
+  background-color: #eee;
 }

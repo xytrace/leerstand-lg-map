@@ -2,22 +2,15 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <title>Impressum</title>
+  <title>FAQ – Häufige Fragen</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Google Font: Work Sans Black and Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter&family=Work+Sans:wght@900&display=swap" rel="stylesheet">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/Leerstandsbot_Logo.svg">
-
-  <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="page-container">
-
     <header class="header">
       <div class="logo-left">
         <img src="assets/Leerstandsbot_Logo.svg" alt="Leerstandsbot Logo" onclick="window.open('https://t.me/LeerstandsmelderBot', '_blank')" />
@@ -32,7 +25,7 @@
     <div id="menu-toggle" class="menu-button">&#9776;</div>
     <div id="menu-overlay" class="menu-hidden">
       <ul>
-        <li><button onclick="location.href='index.html'">Leerstandsbot Karte</button></li>
+        <li><button onclick="location.href='index.html'">🏠 Startseite</button></li>
         <li><a href="impressum.html" target="_blank">Impressum</a></li>
         <li><a href="datenschutz.html" target="_blank">Datenschutz</a></li>
         <li><a href="about.html" target="_blank">Über das Projekt</a></li>
@@ -42,27 +35,37 @@
 
     <main class="main-map">
       <section class="text-content" style="padding: 1rem; max-width: 800px; margin: auto;">
-        <h2>Impressum</h2>
+        <h2>FAQ – Häufige Fragen</h2>
 
-        <p><strong>Angaben gemäß § 5 TMG:</strong><br>
-        Die Linke Kreisverband Lüneburg<br>
-        Reichenbachstraße 2<br>
-        21335 Lüneburg</p>
+        <p><strong>Wie kann ich einen Leerstand melden?</strong><br>
+        Über unseren <a href="https://t.me/LeerstandsmelderBot" target="_blank">Telegram-Bot</a>. Einfach starten und den Anweisungen folgen.</p>
 
-        <p><strong>Vertreten durch:</strong><br>
-        Den Kreisvorstand</p>
+        <p><strong>Muss ich mich registrieren?</strong><br>
+        Ja, in Telegram wirst du bei deiner ersten Meldung nach einem Nutzernamen gefragt. Dein Nutzername ist frei wählbar und du kannst anonym bleiben.</p>
 
-        <p><strong>Kontakt:</strong><br>
-        Telefon: 04131 2843 346<br>
-        E-Mail: <a href="mailto:vorstand@dielinke-lueneburg.de">vorstand@dielinke-lueneburg.de</a></p>
+        <p><strong>Wie funktioniert das mit der Bestenliste?</strong><br>
+        Für jede Meldung bekommst du 5 Punkte zugeschrieben. Wenn du eine bereits gemeldete Adresse eingibst, erhälst du 2 Punkte für die Bestätigung. In Telegram kannst du die Bestenliste (Top 3) einsehen.</p>
 
-        <p><em>Stand: August 2025</em></p>
+        <p><strong>Wie kann ich einen bestehenden Leerstand bestätigen?</strong><br>
+        Gib einfach ganz normal die Adresse ein. Wenn diese bereits gemeldet wurde, erkennt der Bot dies automatisch und dir werden 2 Punkte für die Bestätigung zugeschrieben</p>
+
+        <p><strong>Kann ich auch Fotos hochladen?</strong><br>
+        Ja! Du kannst ein Bild vom Leerstand anhängen, wenn du möchtest. Das hilft uns, den Leerstand genauer zu dokumentieren. Bitte achte dabei darauf, möglichst keine fremden Personen zu fotografieren.</p>
+
+        <p><strong>Wie kann ich meine Meldungen einsehen?</strong><br>
+        In Telegram kannst du unter "Meine Meldungen" deine gemeldeten Leerstände einsehen. Die Karte visualisiert diese nur.</p>
+
+        <p><strong>Wie kann ich meine Meldungen löschen?</strong><br>
+        In Telegram kannst du unter "Meine Meldungen" deine Meldung löschen.</p>
+
+        <p><strong>Wie aktuell sind die Daten?</strong><br>
+        Die Karte wird automatisch alle 10 Sekunden aktualisiert.</p>
+
+        <p><em>Weitere Fragen folgen bald …</em></p>
       </section>
     </main>
-
   </div>
 
-  <!-- Menu Toggle Script -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const toggle = document.getElementById("menu-toggle");

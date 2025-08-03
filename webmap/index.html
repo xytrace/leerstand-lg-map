@@ -2,10 +2,10 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <title>Leerstandsmeldungen Lüneburg</title>
+  <title>Leerstands­meldungen Lüneburg</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google Font: Work Sans Black and Inter -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter&family=Work+Sans:wght@900&display=swap" rel="stylesheet">
 
@@ -34,16 +34,22 @@
       </div>
     </header>
 
-    <!-- Main content area -->
+    <!-- Hamburger Menu -->
+    <div id="menu-toggle" class="menu-button">&#9776;</div>
+    <div id="menu-overlay" class="menu-hidden">
+      <ul>
+        <li><button onclick="resetMapView()">Leerstandsbot Karte</button></li>
+        <li><a href="impressum.html" target="_blank">Impressum</a></li>
+        <li><a href="datenschutz.html" target="_blank">Datenschutz</a></li>
+        <li><a href="about.html" target="_blank">Über das Projekt</a></li>
+        <li><a href="faq.html" target="_blank">FAQ</a></li>
+      </ul>
+    </div>
+
+    <!-- Map -->
     <main class="main-map">
       <div id="map"></div>
     </main>
-
-    <!-- Footer -->
-    <footer>
-      <a href="impressum.html" target="_blank">Impressum</a> |
-      <a href="datenschutz.html" target="_blank">Datenschutz</a>
-    </footer>
 
   </div>
 
