@@ -218,3 +218,9 @@ body.is-index .menu-button {
   display: block;
   width: 100%;
 }
+
+
+.leaflet-top.leaflet-right {
+  top: 100px; /* pushes controls down below header */
+  right: 10px;
+}

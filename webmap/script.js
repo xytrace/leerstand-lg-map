@@ -82,5 +82,5 @@ L.Control.Home = L.Control.extend({
 L.control.home = function (opts) {
   return new L.Control.Home(opts);
 };
-L.control.home({ position: "bottomright" }).addTo(map);
+L.control.home({ position: "topright" }).addTo(map);
 
