@@ -23,9 +23,10 @@
 
     <!-- Hamburger Menu -->
     <div id="menu-toggle" class="menu-button">&#9776;</div>
-    <div id="menu-overlay" class="menu-hidden">
+    <div id="menu-backdrop"></div>
+    <div id="menu-overlay">
       <ul>
-        <li><button onclick="location.href='index.html'">🏠 Startseite</button></li>
+        <li><button onclick="location.href='index.html'">Leerstandsbot Karte</button></li>
         <li><a href="impressum.html" target="_blank">Impressum</a></li>
         <li><a href="datenschutz.html" target="_blank">Datenschutz</a></li>
         <li><a href="about.html" target="_blank">Über das Projekt</a></li>
@@ -33,6 +34,7 @@
       </ul>
     </div>
 
+    <!-- Main Content -->
     <main class="main-map">
       <section class="text-content" style="padding: 1rem; max-width: 800px; margin: auto;">
         <h2>FAQ – Häufige Fragen</h2>
@@ -44,19 +46,19 @@
         Ja, in Telegram wirst du bei deiner ersten Meldung nach einem Nutzernamen gefragt. Dein Nutzername ist frei wählbar und du kannst anonym bleiben.</p>
 
         <p><strong>Wie funktioniert das mit der Bestenliste?</strong><br>
-        Für jede Meldung bekommst du 5 Punkte zugeschrieben. Wenn du eine bereits gemeldete Adresse eingibst, erhälst du 2 Punkte für die Bestätigung. In Telegram kannst du die Bestenliste (Top 3) einsehen.</p>
+        Für jede Meldung bekommst du 5 Punkte. Für die Bestätigung einer bereits gemeldeten Adresse bekommst du 2 Punkte. In Telegram kannst du die Top 3 einsehen.</p>
 
         <p><strong>Wie kann ich einen bestehenden Leerstand bestätigen?</strong><br>
-        Gib einfach ganz normal die Adresse ein. Wenn diese bereits gemeldet wurde, erkennt der Bot dies automatisch und dir werden 2 Punkte für die Bestätigung zugeschrieben</p>
+        Einfach die Adresse eingeben. Wenn diese schon gemeldet wurde, wird das erkannt und du bekommst 2 Punkte für die Bestätigung.</p>
 
         <p><strong>Kann ich auch Fotos hochladen?</strong><br>
-        Ja! Du kannst ein Bild vom Leerstand anhängen, wenn du möchtest. Das hilft uns, den Leerstand genauer zu dokumentieren. Bitte achte dabei darauf, möglichst keine fremden Personen zu fotografieren.</p>
+        Ja! Du kannst ein Bild anhängen. Bitte darauf achten, keine Personen zu fotografieren.</p>
 
         <p><strong>Wie kann ich meine Meldungen einsehen?</strong><br>
-        In Telegram kannst du unter "Meine Meldungen" deine gemeldeten Leerstände einsehen. Die Karte visualisiert diese nur.</p>
+        In Telegram unter „Meine Meldungen“. Die Karte visualisiert sie.</p>
 
         <p><strong>Wie kann ich meine Meldungen löschen?</strong><br>
-        In Telegram kannst du unter "Meine Meldungen" deine Meldung löschen.</p>
+        Ebenfalls über „Meine Meldungen“ im Bot.</p>
 
         <p><strong>Wie aktuell sind die Daten?</strong><br>
         Die Karte wird automatisch alle 10 Sekunden aktualisiert.</p>
@@ -66,15 +68,28 @@
     </main>
   </div>
 
+  <!-- Slide-in Menu Script -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const toggle = document.getElementById("menu-toggle");
       const overlay = document.getElementById("menu-overlay");
-      if (toggle && overlay) {
-        toggle.addEventListener("click", () => {
-          overlay.classList.toggle("menu-hidden");
-        });
+      const backdrop = document.getElementById("menu-backdrop");
+
+      function openMenu() {
+        overlay.classList.add("open");
+        backdrop.classList.add("visible");
       }
+
+      function closeMenu() {
+        overlay.classList.remove("open");
+        backdrop.classList.remove("visible");
+      }
+
+      toggle.addEventListener("click", openMenu);
+      backdrop.addEventListener("click", closeMenu);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeMenu();
+      });
     });
   </script>
 </body>

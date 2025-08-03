@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <title>Leerstands­meldungen Lüneburg</title>
+  <title>Leerstandsmeldungen Lüneburg</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Google Fonts -->
@@ -24,11 +24,9 @@
       <div class="logo-left">
         <img src="assets/Leerstandsbot_Logo.svg" alt="Leerstandsbot Logo" onclick="window.open('https://t.me/LeerstandsmelderBot', '_blank')" />
       </div>
-
       <h1>
         <span onclick="location.href='index.html'">Leerstandsbot Karte</span>
       </h1>
-
       <div class="logo-right">
         <img src="assets/KV_LG_Logo.svg" alt="KV Lüneburg Logo" onclick="window.open('https://www.dielinke-lueneburg.de/', '_blank')" />
       </div>
@@ -36,7 +34,8 @@
 
     <!-- Hamburger Menu -->
     <div id="menu-toggle" class="menu-button">&#9776;</div>
-    <div id="menu-overlay" class="menu-hidden">
+    <div id="menu-backdrop"></div>
+    <div id="menu-overlay">
       <ul>
         <li><button onclick="resetMapView()">Leerstandsbot Karte</button></li>
         <li><a href="impressum.html" target="_blank">Impressum</a></li>
@@ -56,5 +55,36 @@
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="script.js" type="module"></script>
+
+  <!-- Menu Toggle Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.getElementById("menu-toggle");
+      const overlay = document.getElementById("menu-overlay");
+      const backdrop = document.getElementById("menu-backdrop");
+
+      function openMenu() {
+        overlay.classList.add("open");
+        backdrop.classList.add("visible");
+      }
+
+      function closeMenu() {
+        overlay.classList.remove("open");
+        backdrop.classList.remove("visible");
+      }
+
+      toggle.addEventListener("click", openMenu);
+      backdrop.addEventListener("click", closeMenu);
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeMenu();
+      });
+    });
+
+    // Expose resetMapView globally if used in menu
+    window.resetMapView = () => {
+      if (window.map) map.setView([53.246, 10.414], 13);
+    };
+  </script>
 </body>
 </html>

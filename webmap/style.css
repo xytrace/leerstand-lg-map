@@ -116,64 +116,6 @@ body {
   color: black;
 }
 
-/* ----------------------------------------
-   🧭 MAP MENU + HOME BUTTON
----------------------------------------- */
-
-/* Floating hamburger button */
-.menu-button {
-  position: absolute;
-  top: 80px;
-  left: 10px;
-  font-size: 28px;
-  background: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  z-index: 1001;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  cursor: pointer;
-}
-
-/* Dropdown overlay for menu */
-#menu-overlay {
-  position: absolute;
-  top: 120px;
-  left: 10px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  padding: 12px;
-  z-index: 1000;
-  width: 200px;
-}
-
-#menu-overlay ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-#menu-overlay li {
-  margin-bottom: 10px;
-}
-
-#menu-overlay a,
-#menu-overlay button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  text-decoration: none;
-  color: black;
-  background: none;
-  border: none;
-  font: inherit;
-  cursor: pointer;
-}
-
-.menu-hidden {
-  display: none;
-}
-
 /* Leaflet custom home button above zoom controls */
 .leaflet-control-custom {
   display: flex;
@@ -185,4 +127,83 @@ body {
 /* Optional hover effect */
 .leaflet-control-custom:hover {
   background-color: #eee;
+}
+
+/* ----------------------------------------
+   🧭 SLIDE-IN MENU + OVERLAY
+---------------------------------------- */
+
+/* Hamburger button */
+.menu-button {
+  position: absolute;
+  top: 80px;
+  left: 10px;
+  font-size: 28px;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  z-index: 1002;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+
+/* Fullscreen darkened background */
+#menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: none;
+}
+
+/* Slide-in overlay */
+#menu-overlay {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background: white;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.3);
+  padding: 20px 15px;
+  z-index: 1001;
+  transition: left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+#menu-overlay.open {
+  left: 0;
+}
+
+#menu-backdrop.visible {
+  display: block;
+}
+
+#menu-overlay ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#menu-overlay li {
+  margin-bottom: 14px;
+}
+
+#menu-overlay a,
+#menu-overlay button {
+  color: #FF0000; /* red text */
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 900;
+  font-size: 1.1em;
+  background: none;
+  border: none;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  display: block;
+  width: 100%;
 }

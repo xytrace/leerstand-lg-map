@@ -4,13 +4,21 @@
   <meta charset="utf-8" />
   <title>Über das Projekt</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter&family=Work+Sans:wght@900&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/Leerstandsbot_Logo.svg">
+
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="page-container">
+
+    <!-- Header -->
     <header class="header">
       <div class="logo-left">
         <img src="assets/Leerstandsbot_Logo.svg" alt="Leerstandsbot Logo" onclick="window.open('https://t.me/LeerstandsmelderBot', '_blank')" />
@@ -23,7 +31,8 @@
 
     <!-- Hamburger Menu -->
     <div id="menu-toggle" class="menu-button">&#9776;</div>
-    <div id="menu-overlay" class="menu-hidden">
+    <div id="menu-backdrop"></div>
+    <div id="menu-overlay">
       <ul>
         <li><button onclick="location.href='index.html'">Leerstandsbot Karte</button></li>
         <li><a href="impressum.html" target="_blank">Impressum</a></li>
@@ -33,6 +42,7 @@
       </ul>
     </div>
 
+    <!-- Main Content -->
     <main class="main-map">
       <section class="text-content" style="padding: 1rem; max-width: 800px; margin: auto;">
         <h2>Über das Projekt</h2>
@@ -47,15 +57,28 @@
     </main>
   </div>
 
+  <!-- Slide-in Menu Script -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const toggle = document.getElementById("menu-toggle");
       const overlay = document.getElementById("menu-overlay");
-      if (toggle && overlay) {
-        toggle.addEventListener("click", () => {
-          overlay.classList.toggle("menu-hidden");
-        });
+      const backdrop = document.getElementById("menu-backdrop");
+
+      function openMenu() {
+        overlay.classList.add("open");
+        backdrop.classList.add("visible");
       }
+
+      function closeMenu() {
+        overlay.classList.remove("open");
+        backdrop.classList.remove("visible");
+      }
+
+      toggle.addEventListener("click", openMenu);
+      backdrop.addEventListener("click", closeMenu);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeMenu();
+      });
     });
   </script>
 </body>

@@ -84,14 +84,3 @@ L.control.home = function (opts) {
 };
 L.control.home({ position: "bottomright" }).addTo(map);
 
-// --- Hamburger menu toggle logic
-document.addEventListener("DOMContentLoaded", () => {
-  const toggle = document.getElementById("menu-toggle");
-  const overlay = document.getElementById("menu-overlay");
-  if (toggle && overlay) {
-    toggle.addEventListener("click", () => {
-      overlay.classList.toggle("menu-hidden");
-    });
-  }
-});
-
