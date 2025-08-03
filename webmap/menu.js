@@ -5,27 +5,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!toggle || !overlay || !backdrop) return;
 
-  // Ensure hidden state on load
+  // Set initial state
   overlay.classList.remove("open");
   backdrop.classList.remove("visible");
+  toggle.textContent = "☰"; // Hamburger on load
 
   function openMenu() {
     overlay.classList.add("open");
     backdrop.classList.add("visible");
+    toggle.textContent = "✕"; // Change to X when open
   }
 
   function closeMenu() {
     overlay.classList.remove("open");
     backdrop.classList.remove("visible");
+    toggle.textContent = "☰"; // Back to hamburger when closed
   }
 
   toggle.addEventListener("click", () => {
     const isOpen = overlay.classList.contains("open");
-    if (isOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
+    isOpen ? closeMenu() : openMenu();
   });
 
   backdrop.addEventListener("click", closeMenu);
