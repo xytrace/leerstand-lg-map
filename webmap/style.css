@@ -136,14 +136,17 @@ body {
   position: sticky;
   top: 80px;
   left: 10px;
+  z-index: 1005;
   font-size: 28px;
   background: white;
   padding: 6px 12px;
   border-radius: 8px;
-  z-index: 1005;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   cursor: pointer;
+  width: fit-content;
+  margin-left: 10px;
 }
+
 
 #menu-overlay {
   position: fixed;
