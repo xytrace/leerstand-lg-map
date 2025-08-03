@@ -129,10 +129,6 @@ body {
   background-color: #eee;
 }
 
-/* ----------------------------------------
-   🧭 SLIDE-IN MENU + OVERLAY
----------------------------------------- */
-
 /* Hamburger button */
 .menu-button {
   position: absolute;
@@ -147,42 +143,29 @@ body {
   cursor: pointer;
 }
 
-/* Fullscreen darkened background */
-#menu-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  display: none;
-}
-
-/* Slide-in overlay */
+/* Slide-in menu */
 #menu-overlay {
   position: fixed;
   top: 0;
-  left: -250px;
+  left: 0;
   width: 250px;
   height: 100%;
-  background: white;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.3);
+  background-color: white;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
   padding: 20px 15px;
   z-index: 1001;
-  transition: left 0.3s ease;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
 }
 
+/* When open, slide in */
 #menu-overlay.open {
-  left: 0;
+  transform: translateX(0);
 }
 
-#menu-backdrop.visible {
-  display: block;
-}
-
+/* Menu items */
 #menu-overlay ul {
   list-style: none;
   padding: 0;
@@ -195,7 +178,7 @@ body {
 
 #menu-overlay a,
 #menu-overlay button {
-  color: #FF0000; /* red text */
+  color: #FF0000;
   font-family: 'Work Sans', sans-serif;
   font-weight: 900;
   font-size: 1.1em;

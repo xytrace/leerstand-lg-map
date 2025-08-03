@@ -22,13 +22,15 @@
     <!-- Header -->
     <header class="header">
       <div class="logo-left">
-        <img src="assets/Leerstandsbot_Logo.svg" alt="Leerstandsbot Logo" onclick="window.open('https://t.me/LeerstandsmelderBot', '_blank')" />
+        <img src="assets/Leerstandsbot_Logo.svg" alt="Leerstandsbot Logo"
+             onclick="window.open('https://t.me/LeerstandsmelderBot', '_blank')" />
       </div>
       <h1>
         <span onclick="location.href='index.html'">Leerstandsbot Karte</span>
       </h1>
       <div class="logo-right">
-        <img src="assets/KV_LG_Logo.svg" alt="KV Lüneburg Logo" onclick="window.open('https://www.dielinke-lueneburg.de/', '_blank')" />
+        <img src="assets/KV_LG_Logo.svg" alt="KV Lüneburg Logo"
+             onclick="window.open('https://www.dielinke-lueneburg.de/', '_blank')" />
       </div>
     </header>
 
@@ -49,14 +51,14 @@
     <main class="main-map">
       <div id="map"></div>
     </main>
-
   </div>
 
-  <!-- Leaflet JS -->
+  <!-- Leaflet + Custom JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="script.js" type="module"></script>
+  <script src="menu.js"></script>
 
-  <!-- Menu Toggle Script -->
+  <!-- Menu Fallback Logic (in case menu.js not modular) -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const toggle = document.getElementById("menu-toggle");
@@ -75,15 +77,16 @@
 
       toggle.addEventListener("click", openMenu);
       backdrop.addEventListener("click", closeMenu);
-
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") closeMenu();
       });
     });
 
-    // Expose resetMapView globally if used in menu
+    // Reset map view to initial position
     window.resetMapView = () => {
-      if (window.map) map.setView([53.246, 10.414], 13);
+      if (window.map) {
+        map.setView([53.246, 10.414], 13);
+      }
     };
   </script>
 </body>
