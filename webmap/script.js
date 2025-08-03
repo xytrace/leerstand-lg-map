@@ -72,13 +72,19 @@ L.Control.Home = L.Control.extend({
     btn.style.cursor = "pointer";
     btn.style.backgroundColor = "white";
 
-    L.DomEvent.on(btn, "click", () => {
+    // Prevent map from reacting to clicks on this control
+    L.DomEvent.disableClickPropagation(btn);
+    L.DomEvent.disableScrollPropagation(btn);
+
+    L.DomEvent.on(btn, "click", (e) => {
+      e.preventDefault(); // prevent any default behavior
       map.setView([53.246, 10.414], 13);
     });
 
     return btn;
   }
 });
+
 L.control.home = function (opts) {
   return new L.Control.Home(opts);
 };
