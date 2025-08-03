@@ -1,31 +1,36 @@
-// menu.js
 document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.getElementById("menu-toggle");
   const overlay = document.getElementById("menu-overlay");
+  const backdrop = document.getElementById("menu-backdrop");
 
-  if (!toggle || !overlay) return;
+  if (!toggle || !overlay || !backdrop) return;
 
-  // Stelle sicher, dass das Menü beim Laden versteckt ist
-  overlay.classList.add("menu-hidden");
-  overlay.style.display = "none";
+  // Ensure hidden state on load
+  overlay.classList.remove("open");
+  backdrop.classList.remove("visible");
+
+  function openMenu() {
+    overlay.classList.add("open");
+    backdrop.classList.add("visible");
+  }
+
+  function closeMenu() {
+    overlay.classList.remove("open");
+    backdrop.classList.remove("visible");
+  }
 
   toggle.addEventListener("click", () => {
-    const isHidden = overlay.classList.contains("menu-hidden");
-
-    if (isHidden) {
-      // Menü anzeigen
-      overlay.style.display = "block";
-      // Erzwinge ein Reflow, damit transition korrekt läuft
-      void overlay.offsetWidth;
-      overlay.classList.remove("menu-hidden");
+    const isOpen = overlay.classList.contains("open");
+    if (isOpen) {
+      closeMenu();
     } else {
-      // Menü verstecken
-      overlay.classList.add("menu-hidden");
-      setTimeout(() => {
-        if (overlay.classList.contains("menu-hidden")) {
-          overlay.style.display = "none";
-        }
-      }, 300); // Dauer der CSS-Transition in ms
+      openMenu();
     }
+  });
+
+  backdrop.addEventListener("click", closeMenu);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
   });
 });

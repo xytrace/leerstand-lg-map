@@ -58,36 +58,5 @@
   <script src="script.js" type="module"></script>
   <script src="menu.js"></script>
 
-  <!-- Menu Fallback Logic (in case menu.js not modular) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const toggle = document.getElementById("menu-toggle");
-      const overlay = document.getElementById("menu-overlay");
-      const backdrop = document.getElementById("menu-backdrop");
-
-      function openMenu() {
-        overlay.classList.add("open");
-        backdrop.classList.add("visible");
-      }
-
-      function closeMenu() {
-        overlay.classList.remove("open");
-        backdrop.classList.remove("visible");
-      }
-
-      toggle.addEventListener("click", openMenu);
-      backdrop.addEventListener("click", closeMenu);
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeMenu();
-      });
-    });
-
-    // Reset map view to initial position
-    window.resetMapView = () => {
-      if (window.map) {
-        map.setView([53.246, 10.414], 13);
-      }
-    };
-  </script>
 </body>
 </html>
