@@ -118,7 +118,7 @@ body.is-index .menu-button {
 .text-content h2 {
   font-family: 'Work Sans', sans-serif;
   font-weight: 900;
-  color: #FF0000;
+  color: #004B5B;
   font-size: 1.8em;
   margin-bottom: 0.8em;
 }
@@ -161,7 +161,7 @@ body.is-index .menu-button {
   position: fixed;
   top: 0; /* Cover from very top */
   left: 0;
-  width: 30dvh;
+  width: 35dvh;
   height: 100vh;
   background-color: white;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
@@ -206,10 +206,10 @@ body.is-index .menu-button {
 
 #menu-overlay a,
 #menu-overlay button {
-  color: #FF0000;
+  color: #004B5B;
   font-family: 'Work Sans', sans-serif;
   font-weight: 900;
-  font-size: 1.1em;
+  font-size: 1.5em;
   background: none;
   border: none;
   text-align: left;
